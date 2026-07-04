@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GGL</title>
+    <meta name="description" content="Explore GGL's global presence with our interactive map showing office locations across the world." />
+    <meta name="google-site-verification" content="K-upJ1PqAKdxJNqymN1SeK6Tj9mH8Wv00zLJ46gYOqY" />
+    
+    <!-- Defer & Execute Tracking Scripts on Idle/Interaction to Keep Main Thread Free -->
+    <script>
+      (function() {
+        var trackingLoaded = false;
+        var loadTracking = function() {
+          if (trackingLoaded) return;
+          trackingLoaded = true;
+
+          // Remove event listeners
+          triggerEvents.forEach(function(e) {
+            window.removeEventListener(e, loadTracking, { passive: true });
+          });
+
+          // 1. Google Analytics (gtag.js)
+          var gascript = document.createElement('script');
+          gascript.async = true;
+          gascript.src = 'https://www.googletagmanager.com/gtag/js?id=G-RFCYGTWEDT';
+          document.head.appendChild(gascript);
+
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function() { window.dataLayer.push(arguments); };
+          gtag('js', new Date());
+          gtag('config', 'G-RFCYGTWEDT');
+
+          // 2. Google Tag Manager
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-TSNMXT7V');
+        };
+
+        var triggerEvents = ['click', 'mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll'];
+        triggerEvents.forEach(function(e) {
+          window.addEventListener(e, loadTracking, { passive: true });
+        });
+
+        // Fallback: load after 5 seconds of complete idle
+        if (window.addEventListener) {
+          window.addEventListener('load', function() {
+            setTimeout(loadTracking, 5000);
+          });
+        } else {
+          setTimeout(loadTracking, 5000);
+        }
+      })();
+    </script>
+
+    
+    <meta property="og:title" content="GGL Global Presence Map" />
+    <meta property="og:description" content="Interactive Map Explorer with Google Maps Integration" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://www.ggl.sg/lovable-uploads/GGL.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@ggl_global" />
+    <meta name="twitter:image" content="https://www.ggl.sg/lovable-uploads/GGL.png" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TSNMXT7V"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    
+  </body>
+</html>

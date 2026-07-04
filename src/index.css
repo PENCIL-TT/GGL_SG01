@@ -1,0 +1,262 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-brand-navy;
+  }
+
+  p {
+    @apply leading-relaxed text-gray-600;
+  }
+
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 210 100% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 100% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 100% 20%;
+
+    --primary: 43 65% 52%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 100% 20%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 210 11% 95%;
+    --muted-foreground: 215 13% 46%;
+
+    --accent: 43 65% 52%;
+    --accent-foreground: 210 100% 20%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 43 65% 52%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+/* Gold scrollbar */
+.scrollbar-gold::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-gold::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+.scrollbar-gold::-webkit-scrollbar-thumb {
+  background-color: #F6B100;
+  border-radius: 8px;
+  border: 2px solid #ffffff;
+}
+
+.scrollbar-gold {
+  scrollbar-width: thin;
+  scrollbar-color: #F6B100 #ffffff;
+}
+
+
+  .dark {
+    --background: 224 71% 13%;
+    --foreground: 210 40% 98%;
+
+    --card: 224 71% 13%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 71% 13%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 43 65% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 73% 16%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 73% 16%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 43 65% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 73% 16%;
+    --input: 215 73% 16%;
+    --ring: 43 65% 52%;
+  }
+}
+
+@layer components {
+  .section-title {
+    @apply text-2xl lg:text-3xl font-bold text-brand-navy;
+  }
+  
+  .section-spacing {
+    @apply py-14 md:py-20;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1;
+  }
+  
+  .button-primary {
+    @apply bg-brand-gold hover:bg-amber-500 text-brand-navy font-medium py-2 px-4 rounded-md shadow-sm hover:shadow transition-all;
+  }
+  
+  .button-secondary {
+    @apply bg-white hover:bg-gray-50 text-brand-navy font-medium py-2 px-4 rounded-md shadow-sm hover:shadow border border-gray-200 transition-all;
+  }
+}
+
+/* Premium Admin Dashboard Theme (Light Mode) */
+.admin-theme {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #0f172a !important;
+  }
+  
+  p, .text-slate-600, .text-slate-500, .text-slate-400 {
+    color: #475569 !important;
+  }
+  
+  /* Cards */
+  .border-slate-200, .border-slate-100, .border-slate-800 {
+    border-color: #e2e8f0 !important;
+  }
+  
+  .bg-white {
+    background-color: #ffffff !important;
+  }
+  
+  .shadow-sm, .shadow {
+    box-shadow: 0 10px 30px rgba(148, 163, 184, 0.06) !important;
+    border-radius: 1rem !important;
+  }
+  
+  .bg-slate-50 {
+    background-color: #f8fafc !important;
+  }
+
+  .bg-slate-100 {
+    background-color: #f1f5f9 !important;
+  }
+
+  .bg-slate-100\/50 {
+    background-color: rgba(241, 245, 249, 0.5) !important;
+  }
+
+  /* Form Elements */
+  input, textarea, select {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    border-radius: 0.75rem !important;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
+    outline: none !important;
+  }
+  
+  /* Tables */
+  table {
+    border-color: #e2e8f0 !important;
+    background-color: #ffffff !important;
+  }
+  
+  thead tr {
+    background-color: #f8fafc !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+  }
+  
+  th {
+    color: #b45309 !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    background-color: #f8fafc !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.05em !important;
+  }
+  
+  td {
+    border-bottom: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    background-color: #ffffff !important;
+  }
+  
+  tr {
+    background-color: #ffffff !important;
+    transition: background-color 0.2s ease !important;
+  }
+
+  tr:hover td {
+    background-color: #f8fafc !important;
+  }
+  
+  /* Dialogs and Modals styling */
+  div[role="dialog"] {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  }
+  
+  /* Badges & Pills */
+  .bg-amber-100 {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    color: #b45309 !important;
+  }
+  
+  /* Buttons override */
+  .bg-amber-500 {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .bg-amber-500:hover {
+    background-color: #d97706 !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2) !important;
+  }
+
+  .bg-slate-100 {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border-color: #e2e8f0 !important;
+  }
+  
+  .bg-slate-100:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+  }
+}
