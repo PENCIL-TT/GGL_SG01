@@ -11,16 +11,74 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 app.use(express.json());
 
+// Database connection pool and its initialization promise
+let pool;
+let dbPromise = null;
+
+// Clean quotes helper function in case env vars were pasted with quotes in Vercel
+const cleanEnvVar = (val) => (val || '').replace(/['"]/g, '').trim();
+
+async function initDb() {
+  const dbConfig = {
+    host: cleanEnvVar(process.env.DB_HOST),
+    port: parseInt(cleanEnvVar(process.env.DB_PORT || '3306')),
+    user: cleanEnvVar(process.env.DB_USER),
+    password: cleanEnvVar(process.env.DB_PASSWORD),
+    database: cleanEnvVar(process.env.DB_DATABASE || process.env.DB_NAME),
+    ssl: cleanEnvVar(process.env.DB_SSL) === 'true' ? {} : undefined,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000
+  };
+
+  console.log(`Connecting to Hostinger MySQL database at ${dbConfig.host}:${dbConfig.port}...`);
+  
+  try {
+    pool = mysql.createPool(dbConfig);
+    // Verify connection and seed tables
+    await initializeDatabase(pool);
+    console.log('Successfully connected to Hostinger MySQL Database for initialization!');
+    return pool;
+  } catch (error) {
+    console.error('Database connection / initialization failed:', error.message);
+    pool = null; // Ensure pool is null on failure
+    dbPromise = null; // Reset promise so next request can retry
+    console.error('Ensure that:');
+    console.error('1. Your DB environment variables (DB_HOST, DB_USER, DB_PASSWORD, etc.) are set correctly in Vercel dashboard without extra quotes.');
+    console.error('2. Remote connections are allowed in your Hostinger panel (Access host %).');
+    console.error('3. Local firewall is not blocking port 3306.');
+    throw error;
+  }
+}
+
 // Intercept database-dependent API calls to ensure remote MySQL connection is used
-app.use('/api', (req, res, next) => {
+app.use('/api', async (req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
   if (req.path === '/upload') {
     return next();
   }
+  
   if (!pool) {
-    return res.status(500).json({ error: "Hostinger MySQL database connection is offline. Local fallbacks are disabled." });
+    if (!dbPromise) {
+      dbPromise = initDb();
+    }
+    try {
+      await dbPromise;
+    } catch (err) {
+      console.error('Error establishing database pool connection in middleware:', err.message);
+      dbPromise = null; // Reset promise on error to allow retry on next request
+    }
+  }
+
+  if (!pool) {
+    return res.status(500).json({
+      error: "Hostinger MySQL database connection is offline. Local fallbacks are disabled.",
+      details: "Please check your Vercel logs and verify: 1. Environment variables are set correctly (without extra quotes); 2. Remote MySQL access is allowed for '%' (all hosts) in Hostinger hPanel > Databases > Remote MySQL."
+    });
   }
   next();
 });
@@ -41,41 +99,6 @@ fs.writeFileSync = (filePath, data, options) => {
   }
   return originalWriteFileSync(filePath, data, options);
 };
-
-// Database connection pool
-let pool;
-
-async function initDb() {
-  const dbConfig = {
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT || '3306'),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE || process.env.DB_NAME,
-    ssl: process.env.DB_SSL === 'true' ? {} : undefined,
-    waitForConnections: true,
-    connectionLimit: 5,
-    queueLimit: 0,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 10000
-  };
-
-  console.log(`Connecting to MySQL database at ${dbConfig.host}:${dbConfig.port}...`);
-  
-  try {
-    pool = mysql.createPool(dbConfig);
-    
-    await initializeDatabase(pool);
-
-  } catch (error) {
-    console.error('Database connection / initialization failed:', error.message);
-    pool = null; // Ensure pool is null on failure
-    console.error('Ensure that:');
-    console.error('1. Your DB_HOST in the .env file is correct (Hostinger server IP or main-hosting hostname).');
-    console.error('2. Remote connections are allowed in your Hostinger panel (Access host %).');
-    console.error('3. Local firewall is not blocking port 3306.');
-  }
-}
 
 async function initializeDatabase(dbPool) {
   let connection;
@@ -2637,10 +2660,9 @@ if (fs.existsSync(distDir)) {
   });
 }
 
-// Connect to the database. When required by a serverless function (e.g. on
-// Vercel) this module is imported rather than run directly, so only start a
-// listening HTTP server for local/standalone use (npm run dev:server).
-initDb();
+dbPromise = initDb().catch(err => {
+  console.error("Initial database connection failed during startup. Will retry on request.", err.message);
+});
 
 if (require.main === module) {
   app.listen(PORT, () => {
