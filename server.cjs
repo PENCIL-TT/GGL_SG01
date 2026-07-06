@@ -11,6 +11,20 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 app.use(express.json());
 
+// Vercel path restoration middleware. 
+// Vercel sometimes rewrites req.url to the serverless function path (e.g. /api or /api/index.cjs).
+// This middleware restores the original requested path from Vercel's headers so the Express router matches correctly.
+app.use((req, res, next) => {
+  const matchedPath = req.headers['x-matched-path'] || req.headers['x-vercel-forwarded-path'];
+  console.log(`[Vercel Route] Method: ${req.method} | URL: ${req.url} | Matched Path Header: ${matchedPath}`);
+  
+  if (matchedPath && (req.url === '/api' || req.url === '/api/' || req.url.startsWith('/api/index.cjs') || req.url.startsWith('/api/index.js'))) {
+    console.log(`[Vercel Route] Restoring URL from ${req.url} -> ${matchedPath}`);
+    req.url = matchedPath;
+  }
+  next();
+});
+
 // Database connection pool and its initialization promise
 let pool;
 let dbPromise = null;
