@@ -1781,6 +1781,24 @@ export default function AdminDashboard() {
                   >
                     Project Cargo Page
                   </button>
+                  <button
+                    onClick={() => {
+                      setActiveView("service-details");
+                      setActiveServiceDetail("customs-clearance");
+                    }}
+                    className={`w-full text-left px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${activeServiceDetail === 'customs-clearance' ? 'bg-slate-200 text-slate-900' : 'text-slate-500 hover:bg-slate-100'}`}
+                  >
+                    Customs Clearance Page
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveView("service-details");
+                      setActiveServiceDetail("liquid-transportation");
+                    }}
+                    className={`w-full text-left px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${activeServiceDetail === 'liquid-transportation' ? 'bg-slate-200 text-slate-900' : 'text-slate-500 hover:bg-slate-100'}`}
+                  >
+                    Liquid Transportation Page
+                  </button>
                 </div>
               )}
 

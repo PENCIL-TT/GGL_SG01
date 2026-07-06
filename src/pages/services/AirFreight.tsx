@@ -54,6 +54,20 @@ const AirFreight = () => {
     }
   ];
 
+  const defaultSection1Content = `At GGL, we offer a comprehensive range of air freight solutions tailored to meet your time-sensitive and high-priority shipping needs. Our expert air freight teams handle air import, export, and express shipments with precision, offering seamless door-to-door services across global trade lanes.`;
+
+  // Determine which features to display
+  const displayFeatures = data?.features_list && data.features_list.length > 0
+    ? data.features_list.map((featTitle: string) => {
+        const found = defaultFeatures.find(f => f.title.toLowerCase().includes(featTitle.toLowerCase()) || featTitle.toLowerCase().includes(f.title.toLowerCase()));
+        return {
+          title: featTitle,
+          description: found?.description || "Professional air freight and cargo shipping solutions.",
+          icon: found?.icon || <CheckCircle className="h-10 w-10 text-brand-gold" />
+        };
+      })
+    : defaultFeatures;
+
   return (
     <div className="min-h-screen flex flex-col">
       <SEO />
@@ -122,30 +136,18 @@ const AirFreight = () => {
                 {data?.section1_title || "Comprehensive Air Freight Services"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
-              <p className="text-gray-700 mb-6 font-normal text-justify">
-                {data?.section1_content || "At GGL, we offer a comprehensive range of air freight solutions tailored to meet your time-sensitive and high-priority shipping needs. Our expert air freight teams handle air import, export, and express shipments with precision, offering seamless door-to-door services across global trade lanes."}
+              <p className="text-gray-700 mb-6 font-normal text-justify whitespace-pre-wrap leading-relaxed">
+                {data?.section1_content || defaultSection1Content}
               </p>
             </div>
             
             {/* Features Section */}
-            {data?.features_list && data.features_list.length > 0 ? (
-              <div className="max-w-3xl mx-auto mb-12 bg-white rounded-xl p-8 border border-slate-100 shadow-md">
-                <h3 className="text-2xl font-bold text-slate-900 mb-6 text-center">
-                  {data.features_title || "Key Features"}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.features_list.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                      <span className="text-slate-700 font-medium">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              /* Features Grid (Default Static) */
+            <div className="max-w-5xl mx-auto mb-12">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                {data?.features_title || "Key Features"}
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
-                {defaultFeatures.map((feature, index) => (
+                {displayFeatures.map((feature, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -160,7 +162,7 @@ const AirFreight = () => {
                   </motion.div>
                 ))}
               </div>
-            )}
+            </div>
             
             {/* CTA Section */}
             <motion.div

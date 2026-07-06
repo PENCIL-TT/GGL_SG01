@@ -2,7 +2,7 @@ import React from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Truck, MapPin, Navigation, Calendar, Globe } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useCountryNavigation } from "@/hooks/useCountryNavigation";
@@ -25,6 +25,48 @@ const Transportation = () => {
       })
       .catch(() => {});
   }, [countryCode]);
+
+  const defaultFeatures = [
+    {
+      title: "Dedicated Fleet Logistics",
+      description: "A wide range of vehicles optimized for different types of cargo and delivery paths.",
+      icon: <Truck className="h-5 w-5 text-brand-gold" />
+    },
+    {
+      title: "GPS Tracking & Monitoring",
+      description: "Real-time visibility and status updates for your ground shipments.",
+      icon: <Navigation className="h-5 w-5 text-brand-gold" />
+    },
+    {
+      title: "Last-Mile Delivery",
+      description: "Fast and reliable final leg distribution to warehouses, retailers, or doors.",
+      icon: <MapPin className="h-5 w-5 text-brand-gold" />
+    },
+    {
+      title: "Scheduled Distribution",
+      description: "Regularly timed runs for consistent logistics planning and inventory flow.",
+      icon: <Calendar className="h-5 w-5 text-brand-gold" />
+    },
+    {
+      title: "Cross-Border Trucking",
+      description: "Seamless ground transportation connecting key regions and neighboring countries.",
+      icon: <Globe className="h-5 w-5 text-brand-gold" />
+    }
+  ];
+
+  const defaultSection1Content = `GGL boasts a dedicated fleet of vehicles to ensure timely domestic distribution and deliveries. Our efficient operational infrastructure provides our clients with high productivity, frequent services, and fast, reliable distribution operations. GGL is committed to delivering excellence in every aspect of transportation and distribution, making us the dependable choice for your logistics needs.`;
+
+  // Determine which features to display
+  const displayFeatures = data?.features_list && data.features_list.length > 0
+    ? data.features_list.map((featTitle: string) => {
+        const found = defaultFeatures.find(f => f.title.toLowerCase().includes(featTitle.toLowerCase()) || featTitle.toLowerCase().includes(f.title.toLowerCase()));
+        return {
+          title: featTitle,
+          description: found?.description || "Professional domestic and international logistics distribution.",
+          icon: found?.icon || <CheckCircle className="h-5 w-5 text-brand-gold" />
+        };
+      })
+    : defaultFeatures;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -94,27 +136,35 @@ const Transportation = () => {
                 {data?.section1_title || "Comprehensive Transportation Services"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
-              <p className="text-gray-700 mb-6 text-justify">
-                {data?.section1_content || "GGL boasts a dedicated fleet of vehicles to ensure timely domestic distribution and deliveries. Our efficient operational infrastructure provides our clients with high productivity, frequent services, and fast, reliable distribution operations. GGL is committed to delivering excellence in every aspect of transportation and distribution, making us the dependable choice for your logistics needs."}
+              <p className="text-gray-700 mb-6 text-justify whitespace-pre-wrap leading-relaxed">
+                {data?.section1_content || defaultSection1Content}
               </p>
             </div>
             
             {/* Features Section */}
-            {data?.features_list && data.features_list.length > 0 && (
-              <div className="max-w-3xl mx-auto mb-12 bg-white rounded-xl p-8 border border-slate-100 shadow-md">
-                <h3 className="text-2xl font-bold text-slate-900 mb-6 text-center">
-                  {data.features_title || "Key Features"}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.features_list.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                      <span className="text-slate-700 font-medium">{feature}</span>
+            <div className="max-w-5xl mx-auto mb-12">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                {data?.features_title || "Key Features"}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                {displayFeatures.map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+                  >
+                    <div className="mb-3 bg-blue-50 p-2 rounded-full inline-block">
+                      {feature.icon}
                     </div>
-                  ))}
-                </div>
+                    <h3 className="text-lg font-semibold mb-2 text-gray-800">{feature.title}</h3>
+                    <p className="text-gray-600 text-sm">{feature.description}</p>
+                  </motion.div>
+                ))}
               </div>
-            )}
+            </div>
             
             {/* CTA Section */}
             <motion.div

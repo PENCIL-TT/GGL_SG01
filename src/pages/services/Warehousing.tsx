@@ -59,6 +59,24 @@ const Warehousing = () => {
     }
   ];
 
+  const defaultSection1Content = `GGL is a premier supply chain solutions provider, addressing the full spectrum of logistics needs for our clients. We facilitate the movement of goods from suppliers to manufacturers (for parts and components), from manufacturers and brand owners to resellers and consumers (for finished products), and from consumers back to original equipment manufacturers (for spares and returns).
+
+Our state-of-the-art warehouses are tailored to meet clients' specific requirements and are supported by cutting-edge WMS systems. These systems offer complete visibility and advanced features such as online picking and reorder cycle notifications.
+
+Our skilled warehouse team is highly experienced and trained to accommodate the unique needs of each client. They are backed by dedicated teams specializing in forwarding and land transportation.`;
+
+  // Determine which features to display
+  const displayFeatures = data?.features_list && data.features_list.length > 0
+    ? data.features_list.map((featTitle: string) => {
+        const found = defaultFeatures.find(f => f.title.toLowerCase().includes(featTitle.toLowerCase()) || featTitle.toLowerCase().includes(f.title.toLowerCase()));
+        return {
+          title: featTitle,
+          description: found?.description || "Secure storage, fulfillment, and 3PL supply chain services.",
+          icon: found?.icon || <CheckCircle className="h-5 w-5 text-brand-gold" />
+        };
+      })
+    : defaultFeatures;
+
   return (
     <div className="min-h-screen flex flex-col">
       <SEO />
@@ -84,7 +102,7 @@ const Warehousing = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                   className="text-lg text-gray-700 mb-6"
                 >
-                  {data?.hero_subtitle || "Premier supply chain solutions for efficient storage and distribution"}
+                  {data?.hero_subtitle || "Secure storage, fulfillment, and 3PL supply chain services"}
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -110,7 +128,7 @@ const Warehousing = () => {
                     <img
                       alt="Warehousing Service"
                       className="w-full h-full object-cover"
-                      src={data?.hero_image_url || "/warehouse2.png"}
+                      src={data?.hero_image_url || "/lovable-uploads/warehouse.jpg"}
                     />
                   </AspectRatio>
                 </motion.div>
@@ -124,39 +142,21 @@ const Warehousing = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto mb-12">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
-                {data?.section1_title || "Comprehensive Warehousing Services"}
+                {data?.section1_title || "Secure Storage & 3PL Logistics"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
-              <p className="text-gray-700 mb-6 text-justify">
-                {data?.section1_content || "GGL is a premier supply chain solutions provider, addressing the full spectrum of logistics needs for our clients. We facilitate the movement of goods from suppliers to manufacturers (for parts and components), from manufacturers and brand owners to resellers and consumers (for finished products), and from consumers back to original equipment manufacturers (for spares and returns)."}
+              <p className="text-gray-700 mb-6 text-justify whitespace-pre-wrap leading-relaxed">
+                {data?.section1_content || defaultSection1Content}
               </p>
-              {!data && (
-                <>
-                  <p className="text-gray-700 mb-6 text-justify">Our state-of-the-art warehouses are tailored to meet clients' specific requirements and are supported by cutting-edge WMS systems. These systems offer complete visibility and advanced features such as online picking and reorder cycle notifications.</p>
-                  <p className="text-gray-700 mb-6 text-justify">Our skilled warehouse team is highly experienced and trained to accommodate the unique needs of each client. They are backed by dedicated teams specializing in forwarding and land transportation.</p>
-                </>
-              )}
             </div>
             
             {/* Features Section */}
-            {data?.features_list && data.features_list.length > 0 ? (
-              <div className="max-w-3xl mx-auto mb-12 bg-white rounded-xl p-8 border border-slate-100 shadow-md">
-                <h3 className="text-2xl font-bold text-slate-900 mb-6 text-center">
-                  {data.features_title || "Key Features"}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.features_list.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                      <span className="text-slate-700 font-medium">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              /* Features Grid (Default Static) */
+            <div className="max-w-5xl mx-auto mb-12">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                {data?.features_title || "Key Features"}
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                {defaultFeatures.map((feature, index) => (
+                {displayFeatures.map((feature, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -173,7 +173,7 @@ const Warehousing = () => {
                   </motion.div>
                 ))}
               </div>
-            )}
+            </div>
             
             {/* CTA Section */}
             <motion.div
@@ -183,7 +183,7 @@ const Warehousing = () => {
               viewport={{ once: true }}
               className="bg-gradient-to-r from-brand-navy to-blue-700 rounded-xl text-white p-8 text-center"
             >
-              <h3 className="text-2xl font-bold mb-4 text-slate-50">{data?.cta_title || "Ready to Optimize Your Storage?"}</h3>
+              <h3 className="text-2xl font-bold mb-4 text-slate-50">{data?.cta_title || "Ready to Store Your Goods?"}</h3>
               <p className="mb-6 text-blue-50">
                 Contact our team today for tailored warehousing solutions.
               </p>

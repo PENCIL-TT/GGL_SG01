@@ -59,6 +59,26 @@ const LCLConsolidation = () => {
     }
   ];
 
+  const defaultSection1Content = `GGL is a LCL Consolidator with global presence covering North America, UK, Middle East, Indian Sub Continent, South East Asia and Far East. Our LCL Groupage services is backed by very efficient customer support at competitive prices.
+
+The GGL Group is strategically located in the cargo transhipment hubs of Singapore, Malaysia, Srilanka and Dubai offering direct weekly sailings to all major destinations worldwide.
+
+GGL announces the commencement of its operations in India with the launch of its first office in Mumbai. Offices in Chennai and strategic ICD’s like New Delhi, Pune and Bangalore will follow soon. With this significant development GGL will offer in India a wide spectrum of logistics services including LCL Consolidation, Dangerous Cargo transportation, FCL, Airfreight, Warehousing/3 PL logistics and land transport solutions.
+
+GGL with its internet based software platform offers unmatched shipment visibility from origin to final destination thereby delivering a truly differentiated customer experience.`;
+
+  // Determine which features to display
+  const displayFeatures = data?.features_list && data.features_list.length > 0
+    ? data.features_list.map((featTitle: string) => {
+        const found = defaultFeatures.find(f => f.title.toLowerCase().includes(featTitle.toLowerCase()) || featTitle.toLowerCase().includes(f.title.toLowerCase()));
+        return {
+          title: featTitle,
+          description: found?.description || "Professional LCL consolidation and groupage cargo solutions.",
+          icon: found?.icon || <CheckCircle className="h-5 w-5 text-brand-gold" />
+        };
+      })
+    : defaultFeatures;
+
   return (
     <div className="min-h-screen flex flex-col">
       <SEO />
@@ -127,37 +147,18 @@ const LCLConsolidation = () => {
                 {data?.section1_title || "Professional LCL Consolidation Services"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
-              <p className="text-gray-700 mb-6 text-justify">
-                {data?.section1_content || "GGL is a LCL Consolidator with global presence covering North America, UK, Middle East, Indian Sub Continent, South East Asia and Far East. Our LCL Groupage services is backed by very efficient customer support at competitive prices."}
+              <p className="text-gray-700 mb-6 text-justify whitespace-pre-wrap leading-relaxed">
+                {data?.section1_content || defaultSection1Content}
               </p>
-              {!data && (
-                <>
-                  <p className="text-gray-700 mb-6 text-justify">The GGL Group is strategically located in the cargo transhipment hubs of Singapore, Malaysia, Srilanka and Dubai offering direct weekly sailings to all major destinations worldwide.</p>
-                  <p className="text-gray-700 mb-6 text-justify">GGL announces the commencement of its operations in India with the launch of its first office in Mumbai. Offices in Chennai and strategic ICD’s like New Delhi, Pune and Bangalore will follow soon. With this significant development GGL will offer in India a wide spectrum of logistics services including LCL Consolidation, Dangerous Cargo transportation, FCL, Airfreight, Warehousing/3 PL logistics and land transport solutions.</p>
-                  <p className="text-gray-700 mb-6 text-justify">GGL with its internet based software platform offers unmatched shipment visibility from origin to final destination thereby delivering a truly differentiated customer experience.</p>
-                </>
-              )}
             </div>
             
             {/* Features Section */}
-            {data?.features_list && data.features_list.length > 0 ? (
-              <div className="max-w-3xl mx-auto mb-12 bg-white rounded-xl p-8 border border-slate-100 shadow-md">
-                <h3 className="text-2xl font-bold text-slate-900 mb-6 text-center">
-                  {data.features_title || "Key Features"}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.features_list.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                      <span className="text-slate-700 font-medium">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              /* Features Grid (Default Static) */
+            <div className="max-w-5xl mx-auto mb-12">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                {data?.features_title || "Key Features"}
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                {defaultFeatures.map((feature, index) => (
+                {displayFeatures.map((feature, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -174,7 +175,7 @@ const LCLConsolidation = () => {
                   </motion.div>
                 ))}
               </div>
-            )}
+            </div>
             
             {/* CTA Section */}
             <motion.div
