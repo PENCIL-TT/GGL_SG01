@@ -52,9 +52,17 @@ async function initDb() {
   
   try {
     pool = mysql.createPool(dbConfig);
-    // Verify connection and seed tables
-    await initializeDatabase(pool);
-    console.log('Successfully connected to Hostinger MySQL Database for initialization!');
+    // Quick connection check
+    const connection = await pool.getConnection();
+    await connection.query('SELECT 1');
+    connection.release();
+    console.log('Successfully connected and verified Hostinger MySQL Database!');
+
+    // Only run schema verification/seeding if explicitly requested or in local development
+    if (process.env.INIT_DB === 'true' || process.env.NODE_ENV === 'development') {
+      console.log('Verifying schemas and seeding default tables...');
+      await initializeDatabase(pool);
+    }
     return pool;
   } catch (error) {
     console.error('Database connection / initialization failed:', error.message);
