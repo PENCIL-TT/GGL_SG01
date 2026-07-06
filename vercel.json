@@ -33,11 +33,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://YOUR-BACKEND-HOST.example.com/api/:path*"
+      "destination": "/api"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://YOUR-BACKEND-HOST.example.com/uploads/:path*"
+      "destination": "/api"
     },
     {
       "source": "/(.*)",

@@ -1962,8 +1962,14 @@ app.delete('/api/seo/:id', async (req, res) => {
   }
 });
 
-// Serve uploaded files statically
-const uploadDir = path.join(__dirname, 'uploads');
+// Serve uploaded files statically. On serverless platforms (Vercel) the
+// deployed code directory is read-only, so uploads must go to the OS tmp
+// dir instead — note that storage there is ephemeral and not shared across
+// function instances, so persistent uploads need a real storage backend.
+const os = require('os');
+const uploadDir = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'uploads')
+  : path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -2631,9 +2637,16 @@ if (fs.existsSync(distDir)) {
   });
 }
 
-// Start the server and connect to the database
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  initDb();
-});
+// Connect to the database. When required by a serverless function (e.g. on
+// Vercel) this module is imported rather than run directly, so only start a
+// listening HTTP server for local/standalone use (npm run dev:server).
+initDb();
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
 
