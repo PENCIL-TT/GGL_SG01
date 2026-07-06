@@ -25,6 +25,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Test headers endpoint
+app.get('/api/test-headers', (req, res) => {
+  res.json({
+    url: req.url,
+    originalUrl: req.originalUrl,
+    headers: req.headers
+  });
+});
+
 // Database connection pool and its initialization promise
 let pool;
 let dbPromise = null;
