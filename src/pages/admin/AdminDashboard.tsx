@@ -303,21 +303,11 @@ export interface AdminCountry {
 }
 
 const FALLBACK_COUNTRIES: AdminCountry[] = [
-  { code: "AU", name: "Australia", flag: "🇦🇺" },
-  { code: "BD", name: "Bangladesh", flag: "🇧🇩" },
-  { code: "CN", name: "China", flag: "🇨🇳" },
-  { code: "IN", name: "India", flag: "🇮🇳" },
-  { code: "ID", name: "Indonesia", flag: "🇮🇩" },
-  { code: "MY", name: "Malaysia", flag: "🇲🇾" },
-  { code: "MM", name: "Myanmar", flag: "🇲🇲" },
-  { code: "QA", name: "Qatar", flag: "🇶🇦" },
-  { code: "SA", name: "Saudi Arabia", flag: "🇸🇦" },
   { code: "SG", name: "Singapore", flag: "🇸🇬" },
-  { code: "LK", name: "Sri Lanka", flag: "🇱🇰" },
-  { code: "TH", name: "Thailand", flag: "🇹🇭" },
-  { code: "AE", name: "United Arab Emirates", flag: "🇦🇪" },
+  { code: "BD", name: "Bangladesh", flag: "🇧🇩" },
+  { code: "MY", name: "Malaysia", flag: "🇲🇾" },
+  { code: "PK", name: "Pakistan", flag: "🇵🇰" },
   { code: "UK", name: "United Kingdom", flag: "🇬🇧" },
-  { code: "US", name: "United States (USA)", flag: "🇺🇸" },
 ];
 
 const getFrontendUrl = (countryCode: string, view: string, serviceSlug?: string | null) => {
@@ -380,7 +370,10 @@ export default function AdminDashboard() {
     enabled: isAuthenticated,
   });
 
-  const countries = dbCountries || FALLBACK_COUNTRIES;
+  const ALLOWED_COUNTRY_CODES = ["SG", "BD", "MY", "PK", "UK"];
+  const countries = (dbCountries || FALLBACK_COUNTRIES).filter(c => 
+    ALLOWED_COUNTRY_CODES.includes(c.code.toUpperCase())
+  );
 
   // Country Manager CRUD State & Mutations
   const [countryForm, setCountryForm] = useState<Omit<AdminCountry, "id">>({
