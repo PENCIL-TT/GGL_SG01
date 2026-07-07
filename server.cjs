@@ -1453,9 +1453,9 @@ app.get('/api/diagnostics', async (req, res) => {
       raw: rawUser ? `${rawUser.slice(0, 4)}***${rawUser.slice(-2)}` : 'undefined',
       cleaned: rawUser ? `${cleanEnvVar(rawUser).slice(0, 4)}***${cleanEnvVar(rawUser).slice(-2)}` : 'undefined'
     },
-    passwordLength: {
-      raw: rawPass ? rawPass.length : 0,
-      cleaned: rawPass ? cleanEnvVar(rawPass).length : 0
+    password: {
+      raw: rawPass ? '#'.repeat(rawPass.length) : 'undefined',
+      cleaned: rawPass ? '#'.repeat(cleanEnvVar(rawPass).length) : 'undefined'
     },
     database: {
       raw: rawName || 'undefined',
