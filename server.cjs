@@ -30,6 +30,7 @@ app.use((req, res, next) => {
 let pool;
 let dbPromise = null;
 let lastDbAttempt = 0;
+let lastDbError = null; // Stores the last MySQL connection error to expose in API responses
 const DB_ATTEMPT_COOLDOWN = 60000; // 60 seconds cooldown between DB connection retries
 
 // Clean quotes helper function in case env vars were pasted with quotes in Vercel
@@ -61,6 +62,7 @@ async function initDb() {
     await connection.query('SELECT 1');
     connection.release();
     console.log('Successfully connected and verified Hostinger MySQL Database!');
+    lastDbError = null; // Clear any previous errors
 
     // Only run schema verification/seeding if explicitly requested or in local development
     if (process.env.INIT_DB === 'true' || process.env.NODE_ENV === 'development') {
@@ -70,6 +72,7 @@ async function initDb() {
     return pool;
   } catch (error) {
     console.error('Database connection / initialization failed:', error.message);
+    lastDbError = error.message; // Save error message
     pool = null; // Ensure pool is null on failure
     dbPromise = null; // Reset promise so next request can retry
     console.error('Ensure that:');
@@ -111,7 +114,8 @@ app.use('/api', async (req, res, next) => {
     if (req.method !== 'GET') {
       return res.status(500).json({
         error: "Hostinger MySQL database connection is offline. Local fallbacks are disabled for write operations.",
-        details: "Please check your Vercel logs and verify: 1. Environment variables are set correctly (without extra quotes); 2. Remote MySQL access is allowed for '%' (all hosts) in Hostinger hPanel > Databases > Remote MySQL."
+        details: "Please check your Vercel logs and verify: 1. Environment variables are set correctly (without extra quotes); 2. Remote MySQL access is allowed for '%' (all hosts) in Hostinger hPanel > Databases > Remote MySQL.",
+        dbError: lastDbError
       });
     }
     console.log(`Database connection offline. Bypassing and serving local fallback for GET request: ${req.path}`);
@@ -1699,7 +1703,10 @@ app.put('/api/global-presence/:country_code', async (req, res) => {
 // Get all Contact Page records
 app.get('/api/contact-page-content', async (req, res) => {
   if (!pool) {
-    return res.status(503).send('Database connection offline.');
+    return res.status(503).json({
+      error: 'Database connection offline.',
+      dbError: lastDbError
+    });
   }
   try {
     const [rows] = await pool.query('SELECT * FROM `contact_page_content`');
@@ -1714,7 +1721,10 @@ app.get('/api/contact-page-content', async (req, res) => {
 app.get('/api/contact-page-content/:country_code', async (req, res) => {
   const countryCode = req.params.country_code.toUpperCase();
   if (!pool) {
-    return res.status(503).send('Database connection offline.');
+    return res.status(503).json({
+      error: 'Database connection offline.',
+      dbError: lastDbError
+    });
   }
   try {
     const [rows] = await pool.query('SELECT * FROM `contact_page_content` WHERE `country_code` = ?', [countryCode]);
@@ -2562,7 +2572,10 @@ app.put('/api/service-details/:country_code/:service_slug', async (req, res) => 
 // GET all global presence offices
 app.get('/api/global-presence-offices', async (req, res) => {
   if (!pool) {
-    return res.status(500).json({ error: "Hostinger MySQL database connection is offline." });
+    return res.status(500).json({ 
+      error: "Hostinger MySQL database connection is offline.",
+      dbError: lastDbError
+    });
   }
   try {
     const [rows] = await pool.query('SELECT * FROM `global_presence_offices` ORDER BY `office_country` ASC, `city_name` ASC');
