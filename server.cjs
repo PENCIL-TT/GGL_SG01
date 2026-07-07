@@ -1703,10 +1703,7 @@ app.put('/api/global-presence/:country_code', async (req, res) => {
 // Get all Contact Page records
 app.get('/api/contact-page-content', async (req, res) => {
   if (!pool) {
-    return res.status(503).json({
-      error: 'Database connection offline.',
-      dbError: lastDbError
-    });
+    return res.status(503).send(`Database connection offline. Error: ${lastDbError || 'Unknown connection error'}`);
   }
   try {
     const [rows] = await pool.query('SELECT * FROM `contact_page_content`');
@@ -1721,10 +1718,7 @@ app.get('/api/contact-page-content', async (req, res) => {
 app.get('/api/contact-page-content/:country_code', async (req, res) => {
   const countryCode = req.params.country_code.toUpperCase();
   if (!pool) {
-    return res.status(503).json({
-      error: 'Database connection offline.',
-      dbError: lastDbError
-    });
+    return res.status(503).send(`Database connection offline. Error: ${lastDbError || 'Unknown connection error'}`);
   }
   try {
     const [rows] = await pool.query('SELECT * FROM `contact_page_content` WHERE `country_code` = ?', [countryCode]);
@@ -2572,10 +2566,7 @@ app.put('/api/service-details/:country_code/:service_slug', async (req, res) => 
 // GET all global presence offices
 app.get('/api/global-presence-offices', async (req, res) => {
   if (!pool) {
-    return res.status(500).json({ 
-      error: "Hostinger MySQL database connection is offline.",
-      dbError: lastDbError
-    });
+    return res.status(500).send(`Hostinger MySQL database connection is offline. Error: ${lastDbError || 'Unknown connection error'}`);
   }
   try {
     const [rows] = await pool.query('SELECT * FROM `global_presence_offices` ORDER BY `office_country` ASC, `city_name` ASC');
