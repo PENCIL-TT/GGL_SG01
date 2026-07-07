@@ -118,8 +118,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     if (iframe) {
       try {
         // Use higher zoom level for city-specific locations
-        const zoomLevel = city ? 10 : 10;
-        const baseUrl = "https://www.google.com/maps/d/u/0/embed?mid=1d5jZQlEjnKqnsGHvdJWR5wB_-fcQ_Zk&ehbc=2E312F";
+        const zoomLevel = city ? 12 : 10;
+        const baseUrl = "https://www.google.com/maps/d/embed?mid=1gHiLvBql3xBjzw5wfyD2vPQ8IE4jfUE&ehbc=2E312F&noprof=1";
         const newSrc = `${baseUrl}&z=${zoomLevel}&ll=${lat},${lng}&hl=en&ehbc=2E312F&output=embed`;
         iframe.src = newSrc;
         if (city) {
