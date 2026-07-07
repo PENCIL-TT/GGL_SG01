@@ -29,11 +29,14 @@ app.use((req, res, next) => {
 // Database connection pool and its initialization promise
 let pool;
 let dbPromise = null;
+let lastDbAttempt = 0;
+const DB_ATTEMPT_COOLDOWN = 60000; // 60 seconds cooldown between DB connection retries
 
 // Clean quotes helper function in case env vars were pasted with quotes in Vercel
 const cleanEnvVar = (val) => (val || '').replace(/['"]/g, '').trim();
 
 async function initDb() {
+  lastDbAttempt = Date.now();
   const dbConfig = {
     host: cleanEnvVar(process.env.DB_HOST),
     port: parseInt(cleanEnvVar(process.env.DB_PORT || '3306')),
@@ -44,6 +47,7 @@ async function initDb() {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
+    connectTimeout: 2000,
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000
   };
@@ -86,22 +90,31 @@ app.use('/api', async (req, res, next) => {
   }
   
   if (!pool) {
-    if (!dbPromise) {
-      dbPromise = initDb();
-    }
-    try {
-      await dbPromise;
-    } catch (err) {
-      console.error('Error establishing database pool connection in middleware:', err.message);
-      dbPromise = null; // Reset promise on error to allow retry on next request
+    const now = Date.now();
+    if (now - lastDbAttempt > DB_ATTEMPT_COOLDOWN) {
+      if (!dbPromise) {
+        dbPromise = initDb();
+      }
+      try {
+        await dbPromise;
+      } catch (err) {
+        console.error('Error establishing database pool connection in middleware:', err.message);
+        dbPromise = null; // Reset promise on error to allow retry after cooldown
+      }
+    } else {
+      // Cooldown active - database is currently offline/unreachable
+      // Bypassing DB connection attempt to prevent blocking the request
     }
   }
 
   if (!pool) {
-    return res.status(500).json({
-      error: "Hostinger MySQL database connection is offline. Local fallbacks are disabled.",
-      details: "Please check your Vercel logs and verify: 1. Environment variables are set correctly (without extra quotes); 2. Remote MySQL access is allowed for '%' (all hosts) in Hostinger hPanel > Databases > Remote MySQL."
-    });
+    if (req.method !== 'GET') {
+      return res.status(500).json({
+        error: "Hostinger MySQL database connection is offline. Local fallbacks are disabled for write operations.",
+        details: "Please check your Vercel logs and verify: 1. Environment variables are set correctly (without extra quotes); 2. Remote MySQL access is allowed for '%' (all hosts) in Hostinger hPanel > Databases > Remote MySQL."
+      });
+    }
+    console.log(`Database connection offline. Bypassing and serving local fallback for GET request: ${req.path}`);
   }
   next();
 });

@@ -3,7 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Plane, Ship, Truck, Warehouse } from "lucide-react";
+import { Plane, Ship, Truck, Warehouse, Package } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { useCountryNavigation } from "@/hooks/useCountryNavigation";
@@ -70,11 +70,7 @@ const Services = () => {
   const { data: content, isLoading: isContentLoading } = useQuery({
     queryKey: ["services-page", countryCode],
     queryFn: () => fetchServicesPageSettings(countryCode),
-  });
-
-  const { data: dbServices, isLoading: isServicesLoading } = useQuery({
-    queryKey: ["services-list", countryCode],
-    queryFn: () => fetchServicesByCountry(countryCode),
+    retry: false
   });
 
   const getIcon = (iconType: string) => {
@@ -82,32 +78,22 @@ const Services = () => {
       case "Plane": return <Plane className="w-5 h-5" />;
       case "Anchor": return <Ship className="w-5 h-5" />;
       case "Truck": return <Truck className="w-5 h-5" />;
+      case "Package": return <Package className="w-5 h-5" />;
       case "Warehouse":
       default: return <Warehouse className="w-5 h-5" />;
     }
   };
 
-  const services = dbServices ? dbServices.map((service, index) => ({
-    id: service.id || index,
-    icon: getIcon(service.icon_type),
-    title: service.title,
-    image: service.image_url,
-    description: service.description,
-    link: service.link
-  })) : [];
+  const services = [
+    { id: 1, title: 'Ocean Freight', description: "GGL's dedicated ocean freight department specialize in the complete range freight management services for LCL and FCL loads, supported thru a well established and reliable partner network around the world, for efficient collection, storage & delivery from shippers door to door.", image: '/lovable-uploads/oceanfrieght.jpg', link: '/services/ocean-freight', icon: getIcon('Anchor') },
+    { id: 2, title: 'Air Freight', description: 'At GGL, we provide a comprehensive range of air freight services designed to meet all your shipping needs. Our expert air freight teams offer seamless air import, export, and express options, all on a convenient door-to-door basis. GGL stands out with competitive rates.', image: '/cargoplane.png', link: '/services/air-freight', icon: getIcon('Plane') },
+    { id: 3, title: 'Transportation And Distribution', description: 'GGL boasts a dedicated fleet of vehicles to ensure timely domestic distribution and deliveries. Our efficient operational infrastructure provides our clients with high productivity, frequent services, and fast, reliable distribution operations. GGL is committed to delivering excellence.', image: '/truck12.png', link: '/services/transportation', icon: getIcon('Truck') },
+    { id: 4, title: 'Warehousing', description: 'GGL is a premier supply chain solutions provider in Singapore, addressing the full spectrum of logistics needs for our clients. We facilitate the movement of goods from suppliers to manufacturers (for parts and components), from manufacturers and brand owners to resellers and distributors.', image: '/lovable-uploads/warehouse.jpg', link: '/services/warehousing', icon: getIcon('Warehouse') },
+    { id: 5, title: 'LCL Consolidation', description: 'GGL is a LCL Consolidator with global presence covering North America, UK, Middle East, Indian Sub Continent, South East Asia and Far East. Our LCL Groupage services is backed by very efficient customer support at competitive prices.', image: '/lcl.png', link: '/services/lcl-consolidation', icon: getIcon('Warehouse') },
+    { id: 6, title: 'Project Cargo', description: 'Project cargo refers to the specialized transportation of large, heavy, high-value, or complex equipment, often associated with large-scale infrastructure or construction projects.', image: '/projectcargo3.png', link: '/services/project-cargo', icon: getIcon('Package') }
+  ];
 
-  if (isContentLoading || isServicesLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <SEO />
-        <Header />
-        <main className="flex-grow pt-20 flex items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-gold border-t-transparent"></div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+
 
   // Fallbacks
   const heroTitle = content?.hero_title || (isBangladesh ? "Our Logistics Services in Bangladesh" : "Our Logistics Services");

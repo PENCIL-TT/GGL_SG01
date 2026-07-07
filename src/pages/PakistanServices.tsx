@@ -55,11 +55,7 @@ const PakistanServices = () => {
   const { data: content, isLoading: isContentLoading } = useQuery({
     queryKey: ["services-page", "PK"],
     queryFn: () => fetchServicesPageSettings("PK"),
-  });
-
-  const { data: dbServices, isLoading: isServicesLoading } = useQuery({
-    queryKey: ["services-list", "PK"],
-    queryFn: () => fetchServicesByCountry("PK"),
+    retry: false
   });
 
   const getIcon = (iconType: string) => {
@@ -72,29 +68,21 @@ const PakistanServices = () => {
     }
   };
 
-  const services = dbServices ? dbServices.map((service, index) => ({
-    id: service.id || index,
-    htmlId: service.title.toLowerCase().replace(/\s+/g, '-'),
-    icon: getIcon(service.icon_type),
-    title: service.title,
-    image: service.image_url,
-    description: service.description,
-    link: service.link
-  })) : [];
+  const defaultServices = [
+    { id: 1, title: 'Ocean Freight', description: 'At GGL, we specialize in providing comprehensive ocean freight solutions that cater to the diverse needs of our clients. Whether you\'re shipping large volumes or smaller consignments, our services are designed to ensure efficiency, reliability, and cost-effectiveness', image: '/ps1.png', link: '/pakistan/services/ocean-freight', icon: getIcon('Anchor') },
+    { id: 2, title: 'LCL Consolidation', description: 'We collect your goods from your location and prepare them for consolidation. This includes proper labelling, packaging, and documentation to ensure smooth transit.', image: '/ps5.png', link: '/pakistan/services/lcl-consolidation', icon: getIcon('Warehouse') },
+    { id: 3, title: 'Transportation And Distribution', description: 'At GGL, we understand that efficient transportation and distribution are the backbone of a seamless supply chain. Our dedicated fleet and robust infrastructure ensure that your goods reach their destination on time, every time.', image: '/ps3.png', link: '/pakistan/services/transportation', icon: getIcon('Truck') },
+    { id: 4, title: 'Warehousing', description: 'At GGL, we offer comprehensive warehousing and third-party logistics (3PL) solutions designed to streamline your supply chain operations. Our services are tailored to meet the diverse needs of businesses, ensuring efficiency, reliability, and scalability.', image: '/ps4.png', link: '/pakistan/services/warehousing', icon: getIcon('Warehouse') },
+    { id: 5, title: 'Air Freight', description: 'At GGL, we offer a comprehensive range of air freight services designed to meet all your shipping needs. Our expert air freight teams provide seamless air import, export, and express options, all on a convenient door-to-door basis.', image: '/ps2.png', link: '/pakistan/services/air-freight', icon: getIcon('Plane') },
+    { id: 6, title: 'Project Cargo', description: 'At GGL, we specialize in managing project cargo—the transportation of large, heavy, high-value, or complex pieces of equipment and materials essential to major infrastructure, engineering, or industrial projects.', image: '/ps6.png', link: '/pakistan/services/project-cargo', icon: getIcon('Warehouse') }
+  ];
 
-  if (isContentLoading || isServicesLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <ScrollToTop />
-        <SEO />
-        <Header navPaths={navPaths} />
-        <main className="flex-grow pt-20 flex items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-gold border-t-transparent"></div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  const services = defaultServices.map((s, i) => ({
+    ...s,
+    htmlId: s.title.toLowerCase().replace(/\s+/g, '-')
+  }));
+
+
 
   // Fallbacks
   const heroTitle = content?.hero_title || "Our Logistics Services";
