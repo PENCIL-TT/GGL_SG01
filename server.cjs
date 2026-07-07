@@ -1431,6 +1431,64 @@ function saveLocalServicesPages() {
 
 // API Routes
 
+// Database diagnostics endpoint to help verify environment variables and connection state on Vercel
+app.get('/api/diagnostics', async (req, res) => {
+  const cleanEnvVar = (val) => (val || '').replace(/['"]/g, '').trim();
+  const rawHost = process.env.DB_HOST;
+  const rawPort = process.env.DB_PORT;
+  const rawUser = process.env.DB_USER;
+  const rawPass = process.env.DB_PASSWORD;
+  const rawName = process.env.DB_DATABASE || process.env.DB_NAME;
+
+  const config = {
+    host: {
+      raw: rawHost || 'undefined',
+      cleaned: cleanEnvVar(rawHost)
+    },
+    port: {
+      raw: rawPort || 'undefined',
+      cleaned: parseInt(cleanEnvVar(rawPort || '3306'))
+    },
+    user: {
+      raw: rawUser ? `${rawUser.slice(0, 4)}***${rawUser.slice(-2)}` : 'undefined',
+      cleaned: rawUser ? `${cleanEnvVar(rawUser).slice(0, 4)}***${cleanEnvVar(rawUser).slice(-2)}` : 'undefined'
+    },
+    passwordLength: {
+      raw: rawPass ? rawPass.length : 0,
+      cleaned: rawPass ? cleanEnvVar(rawPass).length : 0
+    },
+    database: {
+      raw: rawName || 'undefined',
+      cleaned: cleanEnvVar(rawName)
+    }
+  };
+
+  let connectionStatus = 'unknown';
+  let connectionError = null;
+
+  try {
+    if (pool) {
+      const connection = await pool.getConnection();
+      await connection.query('SELECT 1');
+      connection.release();
+      connectionStatus = 'connected';
+    } else {
+      connectionStatus = 'offline (no pool)';
+      connectionError = lastDbError;
+    }
+  } catch (err) {
+    connectionStatus = 'failed';
+    connectionError = err.message;
+  }
+
+  res.json({
+    status: connectionStatus,
+    error: connectionError,
+    config: config,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Get all About Us records
 app.get('/api/about-us', async (req, res) => {
   if (!pool) {
