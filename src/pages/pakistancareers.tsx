@@ -6,17 +6,28 @@ import { Users, TrendingUp, Heart, Globe, Award, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCountryNavigation } from "@/hooks/useCountryNavigation";
-import { useQuery } from "@tanstack/react-query";
-import { fetchCareersPageSettings } from "@/lib/careers";
+import { useState, useEffect } from 'react';
+import { fetchCareersPageSettings, CareersPageSettings } from "@/lib/careers";
 import SEO from '@/components/SEO';
 
 const PakistanCareers = () => {
   const { navPaths } = useCountryNavigation();
 
-  const { data: content, isLoading } = useQuery({
-    queryKey: ["careers-page", "PK"],
-    queryFn: () => fetchCareersPageSettings("PK"),
-  });
+  const [content, setContent] = useState<CareersPageSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchCareersPageSettings("PK")
+      .then(data => {
+        setContent(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load Pakistan careers settings:", err);
+        setIsLoading(false);
+      });
+  }, []);
 
   const benefits = [{
     icon: <Users className="h-6 w-6 text-brand-gold" />,

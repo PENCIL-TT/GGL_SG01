@@ -3,8 +3,8 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Briefcase, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchCareersPageSettings } from "@/lib/careers";
+import { useState, useEffect } from 'react';
+import { fetchCareersPageSettings, CareersPageSettings } from "@/lib/careers";
 import SEO from '@/components/SEO';
 
 const ukNavPaths = {
@@ -17,10 +17,21 @@ const ukNavPaths = {
 };
 
 const UKCareers = () => {
-  const { data: content, isLoading } = useQuery({
-    queryKey: ["careers-page", "UK"],
-    queryFn: () => fetchCareersPageSettings("UK"),
-  });
+  const [content, setContent] = useState<CareersPageSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchCareersPageSettings("UK")
+      .then(data => {
+        setContent(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load UK careers settings:", err);
+        setIsLoading(false);
+      });
+  }, []);
 
   if (isLoading) {
     return (

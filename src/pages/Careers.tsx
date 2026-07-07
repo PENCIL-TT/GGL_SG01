@@ -5,18 +5,29 @@ import { motion } from 'framer-motion';
 import { Users, TrendingUp, Heart, Globe, Award, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { fetchCareersPageSettings } from "@/lib/careers";
+import { useState, useEffect } from 'react';
+import { fetchCareersPageSettings, CareersPageSettings } from "@/lib/careers";
 import SEO from '@/components/SEO';
 
 const Careers = () => {
   const isBangladesh = window.location.pathname.includes('/bangladesh');
   const countryCode = isBangladesh ? 'BD' : 'SG';
 
-  const { data: content, isLoading } = useQuery({
-    queryKey: ["careers-page", countryCode],
-    queryFn: () => fetchCareersPageSettings(countryCode),
-  });
+  const [content, setContent] = useState<CareersPageSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchCareersPageSettings(countryCode)
+      .then(data => {
+        setContent(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load careers page settings:", err);
+        setIsLoading(false);
+      });
+  }, [countryCode]);
 
   const benefits = [{
     icon: <Users className="h-6 w-6 text-brand-gold" />,

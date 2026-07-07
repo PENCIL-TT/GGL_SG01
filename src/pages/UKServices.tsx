@@ -7,8 +7,8 @@ import { Plane, Ship, Truck, Warehouse } from "lucide-react";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import { useCountryNavigation } from "@/hooks/useCountryNavigation";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
-import { fetchServicesPageSettings } from "@/lib/servicesPage";
+import { useState, useEffect } from 'react';
+import { fetchServicesPageSettings, ServicesPageSettings } from "@/lib/servicesPage";
 import { fetchServicesByCountry } from "@/lib/services";
 import SEO from '@/components/SEO';
 
@@ -52,11 +52,13 @@ const ServiceCard = ({ icon, title, description, image, link, id }: any) => {
 const UKServices = () => {
   const { navPaths } = useCountryNavigation();
 
-  const { data: content, isLoading: isContentLoading } = useQuery({
-    queryKey: ["services-page", "UK"],
-    queryFn: () => fetchServicesPageSettings("UK"),
-    retry: false
-  });
+  const [content, setContent] = useState<ServicesPageSettings | null>(null);
+
+  useEffect(() => {
+    fetchServicesPageSettings("UK")
+      .then(data => setContent(data))
+      .catch(err => console.error("Failed to load UK services settings:", err));
+  }, []);
 
   const getIcon = (iconType: string) => {
     switch (iconType) {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from "@/components/layout/Header";
@@ -7,8 +7,7 @@ import { Plane, Ship, Truck, Warehouse, Package } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { useCountryNavigation } from "@/hooks/useCountryNavigation";
-import { useQuery } from "@tanstack/react-query";
-import { fetchServicesPageSettings } from "@/lib/servicesPage";
+import { fetchServicesPageSettings, ServicesPageSettings } from "@/lib/servicesPage";
 import { fetchServicesByCountry } from "@/lib/services";
 import SEO from '@/components/SEO';
 
@@ -67,11 +66,13 @@ const Services = () => {
   const isBangladesh = window.location.pathname.includes('/bangladesh');
   const countryCode = isBangladesh ? 'BD' : 'SG';
 
-  const { data: content, isLoading: isContentLoading } = useQuery({
-    queryKey: ["services-page", countryCode],
-    queryFn: () => fetchServicesPageSettings(countryCode),
-    retry: false
-  });
+  const [content, setContent] = useState<ServicesPageSettings | null>(null);
+
+  useEffect(() => {
+    fetchServicesPageSettings(countryCode)
+      .then(data => setContent(data))
+      .catch(err => console.error("Failed to load services page settings:", err));
+  }, [countryCode]);
 
   const getIcon = (iconType: string) => {
     switch (iconType) {
